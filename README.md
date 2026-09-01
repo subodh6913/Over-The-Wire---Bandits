@@ -1,105 +1,52 @@
 # OverTheWire Bandit 0–23
 
-> 🏴 Beginner-friendly walkthrough of **OverTheWire Bandit Levels 0–23**
-> Topics: Linux • Bash • SSH • Files • Permissions • Encoding • Compression • Networking • Cron • Shell Scripting
-
----
+> 🏴 **Beginner-friendly Linux & Cybersecurity Practice**
 
 ## 📖 About Bandit
 
-**OverTheWire** provides security wargames for learning cybersecurity through practical challenges.
+**OverTheWire Bandit** is a beginner-friendly Linux security wargame.
 
-**Bandit** is designed for beginners and teaches the Linux/Unix basics needed for other security wargames.
-
-Each level gives you a challenge. Solving it gives you the password for the **next level**.
-
-> 🔑 **Important:** `Bandit X → X+1` means the password obtained while solving Level X is used to log in to **Bandit X+1**.
+Each level gives you a challenge.
+The password you find is used to enter the **next level**.
 
 ---
 
 ## ⚙️ Prerequisites
 
-Recommended:
-
-* 🐧 Linux / Kali Linux / WSL
+* 🐧 Linux / Kali / WSL
 * 💻 Terminal
-* 🔐 Basic SSH knowledge
-* 🌐 Internet connection
-* 🧠 Basic file and directory concepts
+* 🔐 Basic SSH
+* 🌐 Internet
 
----
-
-## 🚀 Connection
+## 🚀 Connect
 
 ```bash
 ssh bandit0@bandit.labs.overthewire.org -p 2220
 ```
 
-### Meaning
-
-| Part                          | Meaning                 |
-| ----------------------------- | ----------------------- |
-| `ssh`                         | Secure Shell client     |
-| `bandit0`                     | Username                |
-| `@`                           | Separates user and host |
-| `bandit.labs.overthewire.org` | Server                  |
-| `-p 2220`                     | SSH port                |
-
-After every level, use its password to log into the next account.
+> `ssh` = remote login, `-p 2220` = SSH port.
 
 ---
 
-# 🏴 Bandit Level 0 → Level 1
+# 🏴 Bandit 0 → 1
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to connect to Bandit using SSH and read a file.
+Learn SSH and reading files.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is stored in a file named `readme` in the home directory.
+Password is inside `readme`.
 
-## 💻 Commands Used
-
-### `ssh`
-
-```bash
-ssh [user]@[host] -p [port]
-```
-
-> Connects to a remote computer securely.
-
-```bash
-ssh bandit0@bandit.labs.overthewire.org -p 2220
-```
-
-### `cat`
-
-```bash
-cat [file]
-```
-
-> Displays the contents of a file.
+### 💻 Commands
 
 ```bash
 cat readme
 ```
 
-### 🔁 Alternatives
+> `cat` displays file contents.
 
-```bash
-less readme
-```
-
-> Opens the file using a pager.
-
-```bash
-head readme
-```
-
-> Displays the beginning of the file.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR
@@ -107,31 +54,23 @@ head readme
 
 ---
 
-# 🏴 Bandit Level 1 → Level 2
+# 🏴 Bandit 1 → 2
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to handle a filename beginning with `-`.
+Handle a filename beginning with `-`.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is stored in a file named exactly:
+Password is in a file named `-`.
 
-```text
--
-```
-
-A filename beginning with `-` can be interpreted as a command option.
-
-## 💻 Commands Used
-
-### `cat ./-`
+### 💻 Commands
 
 ```bash
 cat ./-
 ```
 
-> `./` clearly tells Linux that `-` is a filename in the current directory.
+> `./` tells Linux that `-` is a filename.
 
 ### 🔁 Alternative
 
@@ -139,9 +78,7 @@ cat ./-
 cat -- -
 ```
 
-> `--` tells the command that options have ended.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 PK8fYLZg2hnHSz83plBL1iEPKdD3QToB
@@ -149,45 +86,25 @@ PK8fYLZg2hnHSz83plBL1iEPKdD3QToB
 
 ---
 
-# 🏴 Bandit Level 2 → Level 3
+# 🏴 Bandit 2 → 3
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to work with filenames containing spaces.
+Handle spaces in filenames.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is stored in:
+Password is in a file containing spaces.
 
-```text
---spaces in this filename--
-```
-
-## 💻 Commands Used
-
-### Quoting
-
-```bash
-cat "filename with spaces"
-```
-
-> Quotes make Bash treat the complete text as one filename.
+### 💻 Commands
 
 ```bash
 cat -- "--spaces in this filename--"
 ```
 
-### 🔁 Alternative
+> Quotes keep the filename together.
 
-Escape spaces:
-
-```bash
-cat -- --spaces\ in\ this\ filename--
-```
-
-> `\` escapes the spaces.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 7ZZ2LFrykP2zEyvBl4m3clcL7tGYJPME
@@ -195,54 +112,26 @@ cat -- --spaces\ in\ this\ filename--
 
 ---
 
-# 🏴 Bandit Level 3 → Level 4
+# 🏴 Bandit 3 → 4
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to find hidden files.
+Find hidden files.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is stored in a hidden file inside `inhere`.
+Password is in a hidden file inside `inhere`.
 
-## 💻 Commands Used
-
-### `cd`
+### 💻 Commands
 
 ```bash
-cd [directory]
+ls -la inhere
+cat inhere/.hidden
 ```
 
-> Changes the current directory.
+> `-a` shows hidden files. Linux hidden files usually start with `.`.
 
-```bash
-cd inhere
-```
-
-### `ls -la`
-
-```bash
-ls -la
-```
-
-* `-l` → detailed listing
-* `-a` → include hidden files
-
-Hidden Linux files usually start with `.`.
-
-```bash
-cat .hidden
-```
-
-### 🔁 Alternative
-
-```bash
-find . -maxdepth 1 -type f -name ".*"
-```
-
-> Finds hidden regular files in the current directory.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq
@@ -250,46 +139,26 @@ xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq
 
 ---
 
-# 🏴 Bandit Level 4 → Level 5
+# 🏴 Bandit 4 → 5
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn to identify file types.
+Identify file types.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Many files are inside `inhere`, but only one is human-readable.
+One file in `inhere` contains readable text.
 
-## 💻 Commands Used
-
-### `file`
+### 💻 Commands
 
 ```bash
-file [file]
+file inhere/*
+cat ./inhere/-file07
 ```
 
-> Detects the type of a file.
+> `file` identifies the type of each file.
 
-```bash
-cd inhere
-file ./*
-```
-
-Find the file reported as human-readable text, then:
-
-```bash
-cat ./-file07
-```
-
-### 🔁 Alternative
-
-```bash
-find . -type f -exec file {} \;
-```
-
-> Runs `file` on every file found.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG
@@ -297,57 +166,27 @@ find . -type f -exec file {} \;
 
 ---
 
-# 🏴 Bandit Level 5 → Level 6
+# 🏴 Bandit 5 → 6
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn to search files using size and permission properties.
+Search files using conditions.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Find a file under `inhere` that is:
+Find a file that is readable, not executable, and exactly **1033 bytes**.
 
-* Human-readable
-* Exactly `1033` bytes
-* Not executable
-
-## 💻 Commands Used
-
-### `find`
+### 💻 Commands
 
 ```bash
-find [path] [conditions]
+find inhere -type f -size 1033c ! -executable -readable
+cat inhere/maybehere07/.file2
 ```
 
-> Searches files and directories recursively.
+> `find` searches files.
+> `-type f` = file, `-size 1033c` = 1033 bytes.
 
-Useful options:
-
-```text
--type f       → regular file
--size 1033c   → exactly 1033 bytes
-! -executable → not executable
-```
-
-```bash
-find inhere -type f -size 1033c ! -executable
-```
-
-Then identify/read the matching file:
-
-```bash
-cat ./maybehere07/.file2
-```
-
-### 🔁 Alternative
-
-```bash
-du -ab inhere | grep 1033
-```
-
-> Searches displayed file sizes for `1033`.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 pXa26xhMWaC2SvDotA4r9EgZkulOeSBW
@@ -355,48 +194,26 @@ pXa26xhMWaC2SvDotA4r9EgZkulOeSBW
 
 ---
 
-# 🏴 Bandit Level 6 → Level 7
+# 🏴 Bandit 6 → 7
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn to search the entire filesystem using ownership and file size.
+Search the whole filesystem.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Find a file somewhere on the system that:
+Find a 33-byte file owned by `bandit7` and group `bandit6`.
 
-* Belongs to user `bandit7`
-* Belongs to group `bandit6`
-* Is exactly `33` bytes
-
-## 💻 Commands Used
+### 💻 Commands
 
 ```bash
 find / -type f -user bandit7 -group bandit6 -size 33c 2>/dev/null
+cat /var/lib/dpkg/info/bandit7.password
 ```
 
-### Important options
+> `2>/dev/null` hides permission errors.
 
-| Part             | Meaning                     |
-| ---------------- | --------------------------- |
-| `/`              | Search from filesystem root |
-| `-type f`        | Regular files               |
-| `-user bandit7`  | Owned by `bandit7`          |
-| `-group bandit6` | Group is `bandit6`          |
-| `-size 33c`      | Exactly 33 bytes            |
-| `2>/dev/null`    | Hide error messages         |
-
-Read the matching file.
-
-## 🔁 Alternative
-
-```bash
-find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
-```
-
-> `-type f` is omitted, but the search is less precise.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3
@@ -404,39 +221,25 @@ Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3
 
 ---
 
-# 🏴 Bandit Level 7 → Level 8
+# 🏴 Bandit 7 → 8
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn basic text searching with `grep`.
+Search text with `grep`.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is on the same line as the word `millionth` in `data.txt`.
+Password is next to `millionth` in `data.txt`.
 
-## 💻 Commands Used
-
-### `grep`
-
-```bash
-grep [pattern] [file]
-```
-
-> Searches a file for matching text.
+### 💻 Commands
 
 ```bash
 grep millionth data.txt
 ```
 
-### 🔁 Alternative
+> `grep` searches for text.
 
-```bash
-cat data.txt | grep millionth
-```
-
-> Works, but the direct `grep` command is simpler.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 VR1ljMayciFxbnUokuQmJFw6QC9VKtub
@@ -444,51 +247,27 @@ VR1ljMayciFxbnUokuQmJFw6QC9VKtub
 
 ---
 
-# 🏴 Bandit Level 8 → Level 9
+# 🏴 Bandit 8 → 9
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn `sort`, `uniq`, and pipes.
+Find a unique line.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The password is the only line that occurs exactly once in `data.txt`.
+Only one line appears once.
 
-## 💻 Commands Used
-
-### `sort`
-
-```bash
-sort [file]
-```
-
-> Sorts lines.
-
-### `uniq -u`
-
-```bash
-uniq -u
-```
-
-> Displays only unique lines.
-
-### Pipe `|`
-
-```bash
-command1 | command2
-```
-
-> Sends the output of the first command into the second command.
-
-### Solution
+### 💻 Commands
 
 ```bash
 sort data.txt | uniq -u
 ```
 
-> `sort` is needed because `uniq` compares adjacent lines.
+> `sort` groups identical lines.
+> `uniq -u` shows lines occurring once.
+> `|` sends output to the next command.
 
-### 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl
@@ -496,39 +275,25 @@ EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl
 
 ---
 
-# 🏴 Bandit Level 9 → Level 10
+# 🏴 Bandit 9 → 10
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn to extract readable text from binary data.
+Extract readable text from binary data.
 
-## 🧩 Problem
+### 🧩 Problem
 
-`data.txt` contains binary data. The password is in one of the readable strings preceded by several `=` characters.
+Password is hidden among readable strings.
 
-## 💻 Commands Used
-
-### `strings`
+### 💻 Commands
 
 ```bash
-strings [file]
+strings data.txt | grep "=="
 ```
 
-> Extracts human-readable text from binary files.
+> `strings` extracts readable text.
 
-```bash
-strings data.txt
-```
-
-### Combine with `grep`
-
-```bash
-strings data.txt | grep "="
-```
-
-> Shows strings containing `=`.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 B0s2khmbT9u0geKuOoVGW3JZKhndE3BG
@@ -536,47 +301,25 @@ B0s2khmbT9u0geKuOoVGW3JZKhndE3BG
 
 ---
 
-# 🏴 Bandit Level 10 → Level 11
+# 🏴 Bandit 10 → 11
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn Base64 decoding.
+Decode Base64.
 
-## 🧩 Problem
+### 🧩 Problem
 
-`data.txt` contains Base64-encoded data.
+`data.txt` contains Base64-encoded text.
 
-## 💻 Commands Used
-
-### `base64`
-
-```bash
-base64 [options] [file]
-```
-
-> Encodes or decodes Base64 data.
-
-### `-d`
-
-```bash
-base64 -d [file]
-```
-
-> Decodes Base64.
-
-### Solution
+### 💻 Commands
 
 ```bash
 base64 -d data.txt
 ```
 
-Alternative:
+> `-d` = decode.
 
-```bash
-cat data.txt | base64 -d
-```
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro
@@ -584,43 +327,25 @@ pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro
 
 ---
 
-# 🏴 Bandit Level 11 → Level 12
+# 🏴 Bandit 11 → 12
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn the ROT13 substitution cipher.
+Decode ROT13.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Each alphabetic character has been rotated by 13 positions.
+Letters were shifted by 13 positions.
 
-Example:
-
-```text
-A → N
-B → O
-N → A
-```
-
-## 💻 Commands Used
-
-### `tr`
-
-```bash
-tr SET1 SET2
-```
-
-> Replaces characters from one set with characters from another set.
-
-### Solution
+### 💻 Commands
 
 ```bash
 cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 ```
 
-This converts the ROT13 text back to normal text.
+> `tr` replaces characters.
 
-### 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 GROozWPO8QyN0mGrjUkID0WCYkZiQxrN
@@ -628,106 +353,37 @@ GROozWPO8QyN0mGrjUkID0WCYkZiQxrN
 
 ---
 
-# 🏴 Bandit Level 12 → Level 13
+# 🏴 Bandit 12 → 13
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn hexadecimal dumps and repeated compression/decompression.
+Work with hexdumps and compressed files.
 
-## 🧩 Problem
+### 🧩 Problem
 
-`data.txt` is a hexadecimal dump of a file that has been compressed multiple times.
+`data.txt` is a hex dump of repeatedly compressed data.
 
-## 💻 Commands Used
-
-### `mktemp`
+### 💻 Commands
 
 ```bash
-mktemp -d
-```
-
-> Creates a unique temporary directory.
-
-### `cp`
-
-```bash
-cp [source] [destination]
-```
-
-> Copies files.
-
-### `mv`
-
-```bash
-mv [source] [destination]
-```
-
-> Renames or moves files.
-
-### `xxd -r`
-
-```bash
-xxd -r [file]
-```
-
-> Converts a hexadecimal dump back into binary data.
-
-### Start
-
-```bash
-TMP=$(mktemp -d)
-cd "$TMP"
-cp ~/data.txt .
-xxd -r data.txt > data
+mkdir /tmp/bandit12
+cp data.txt /tmp/bandit12
+cd /tmp/bandit12
+xxd -r data.txt data
 file data
 ```
 
-Now repeatedly inspect the file:
-
-```bash
-file data
-```
-
-Then use the matching tool:
+Then repeatedly decompress according to `file`:
 
 ```bash
 gunzip data
-```
-
-or:
-
-```bash
 bunzip2 data
-```
-
-or:
-
-```bash
 tar -xf data
 ```
 
-Rename files when necessary:
+> Use `file` after every step to know what to do next.
 
-```bash
-mv data data.gz
-gunzip data.gz
-```
-
-Continue:
-
-```text
-file → identify format → extract/decompress → file again
-```
-
-until you reach readable text.
-
-### 🔁 Alternative
-
-Use `file` after every step instead of trying to guess the next compression format.
-
-> 🧠 **Important:** The filename does not tell you the real file type. `file` tells you what it actually is.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 qQYQiHOBPR8zR61qxYqX45quvihF2uzk
@@ -735,69 +391,28 @@ qQYQiHOBPR8zR61qxYqX45quvihF2uzk
 
 ---
 
-# 🏴 Bandit Level 13 → Level 14
+# 🏴 Bandit 13 → 14
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn SSH private-key authentication.
+Use an SSH private key.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Instead of a password, you are given an SSH private key.
+A private key is provided instead of a password.
 
-## 💻 Commands Used
-
-### `ssh -i`
-
-```bash
-ssh -i [private_key] [user]@[host] -p [port]
-```
-
-> Uses a private key for SSH authentication.
-
-### `chmod`
-
-```bash
-chmod [permissions] [file]
-```
-
-> Changes file permissions.
-
-### Solution
-
-The key is stored in:
-
-```bash
-cat sshkey.private
-```
-
-Save/copy it to a local file, then:
+### 💻 Commands
 
 ```bash
 chmod 600 sshkey.private
-```
-
-Connect:
-
-```bash
 ssh -i sshkey.private bandit14@bandit.labs.overthewire.org -p 2220
-```
-
-Then:
-
-```bash
 cat /etc/bandit_pass/bandit14
 ```
 
-### Why `chmod 600`?
+> `chmod 600` protects the private key.
+> `-i` tells SSH which key to use.
 
-```text
-6 → read + write for owner
-0 → no permissions for group
-0 → no permissions for others
-```
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 aaWecNkG4FhxJQxz07uiwzVP6bJiYS65
@@ -805,43 +420,25 @@ aaWecNkG4FhxJQxz07uiwzVP6bJiYS65
 
 ---
 
-# 🏴 Bandit Level 14 → Level 15
+# 🏴 Bandit 14 → 15
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn basic TCP communication and ports.
+Learn basic networking.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Send the current password to port `30000` on `localhost`.
+Send the current password to port `30000`.
 
-## 💻 Commands Used
-
-### `nc`
-
-```bash
-nc [host] [port]
-```
-
-> Netcat creates network connections.
-
-### Solution
-
-```bash
-cat /etc/bandit_pass/bandit14 | nc localhost 30000
-```
-
-Or:
+### 💻 Commands
 
 ```bash
 echo "aaWecNkG4FhxJQxz07uiwzVP6bJiYS65" | nc localhost 30000
 ```
 
-### `localhost`
+> `nc` = Netcat, used for network connections.
 
-> Means the same computer you are currently using.
-
-### 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7
@@ -849,27 +446,17 @@ pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7
 
 ---
 
-# 🏴 Bandit Level 15 → Level 16
+# 🏴 Bandit 15 → 16
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn SSL/TLS networking.
+Learn SSL/TLS connections.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Send the current password to port `30001`, but this service requires SSL/TLS.
+Send the password to port `30001` using SSL.
 
-## 💻 Commands Used
-
-### `openssl s_client`
-
-```bash
-openssl s_client -connect [host]:[port]
-```
-
-> Creates an SSL/TLS client connection.
-
-### Solution
+### 💻 Commands
 
 ```bash
 openssl s_client -connect localhost:30001
@@ -881,9 +468,9 @@ Then enter:
 pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7
 ```
 
-> Messages such as `DONE` or `RENEGOTIATING` can appear during the TLS session.
+> `openssl s_client` creates an SSL/TLS connection.
 
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V
@@ -891,47 +478,23 @@ kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V
 
 ---
 
-# 🏴 Bandit Level 16 → Level 17
+# 🏴 Bandit 16 → 17
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn port scanning, service discovery and SSH keys.
+Learn port scanning and SSH keys.
 
-## 🧩 Problem
+### 🧩 Problem
 
-Find the SSL service listening on a port between `31000` and `32000`.
+Find the SSL service between ports `31000–32000`.
 
-## 💻 Commands Used
-
-### `nmap`
-
-```bash
-nmap [options] [target]
-```
-
-> Scans a host to discover open ports/services.
-
-### `-p`
-
-```bash
--p 31000-32000
-```
-
-> Scans only the specified port range.
-
-### Solution
+### 💻 Commands
 
 ```bash
 nmap -sV -p 31000-32000 localhost
 ```
 
-Find the SSL-enabled service. In the current chain it is:
-
-```text
-31790
-```
-
-Connect:
+Find the SSL port, then:
 
 ```bash
 openssl s_client -connect localhost:31790 -quiet
@@ -943,27 +506,14 @@ Enter:
 kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V
 ```
 
-The service returns an SSH private key.
-
-Save it, for example:
+Save the returned private key:
 
 ```bash
-nano /tmp/bandit17.key
+chmod 600 key
+ssh -i key bandit17@bandit.labs.overthewire.org -p 2220
 ```
 
-Then:
-
-```bash
-chmod 600 /tmp/bandit17.key
-```
-
-Connect:
-
-```bash
-ssh -i /tmp/bandit17.key bandit17@bandit.labs.overthewire.org -p 2220
-```
-
-### 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 OQxXZjELndr90zuhOTDYBEomI0SZITXI
@@ -971,50 +521,25 @@ OQxXZjELndr90zuhOTDYBEomI0SZITXI
 
 ---
 
-# 🏴 Bandit Level 17 → Level 18
+# 🏴 Bandit 17 → 18
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to compare files.
+Compare files.
 
-## 🧩 Problem
+### 🧩 Problem
 
-There are two files:
+Only one line changed between two files.
 
-```text
-passwords.old
-passwords.new
-```
-
-Only one line was changed. The changed line in `passwords.new` is the next password.
-
-## 💻 Commands Used
-
-### `diff`
-
-```bash
-diff [file1] [file2]
-```
-
-> Shows differences between files.
-
-### Solution
+### 💻 Commands
 
 ```bash
 diff passwords.old passwords.new
 ```
 
-Read the changed line from `passwords.new`.
+> `diff` shows differences between files.
 
-### 🔁 Alternative
-
-```bash
-grep -Fxv -f passwords.old passwords.new
-```
-
-> Shows lines present in `passwords.new` but not in `passwords.old`.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
@@ -1022,39 +547,25 @@ KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
 
 ---
 
-# 🏴 Bandit Level 18 → Level 19
+# 🏴 Bandit 18 → 19
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how to execute a remote SSH command without starting an interactive shell.
+Execute a remote command through SSH.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The `.bashrc` file logs you out immediately when you try to log in normally.
+Normal login immediately logs you out.
 
-The password is stored in `readme`.
-
-## 💻 Commands Used
-
-### SSH remote command
-
-```bash
-ssh [user]@[host] -p [port] "[command]"
-```
-
-> Executes a command on the remote machine.
-
-### Solution
-
-From your local terminal:
+### 💻 Commands
 
 ```bash
 ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat readme"
 ```
 
-The command runs before the automatic logout.
+> The command runs remotely without opening a normal shell.
 
-### 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA
@@ -1062,55 +573,27 @@ The command runs before the automatic logout.
 
 ---
 
-# 🏴 Bandit Level 19 → Level 20
+# 🏴 Bandit 19 → 20
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn about **SUID / setuid** programs.
+Understand SUID programs.
 
-## 🧩 Problem
+### 🧩 Problem
 
-A special program in the home directory can execute commands with another user's privileges.
+A special program can execute commands as `bandit20`.
 
-## 💻 Commands Used
-
-### Run a local program
-
-```bash
-./program
-```
-
-> `./` means "run the program from the current directory."
-
-### Solution
-
-First see how it works:
-
-```bash
-./bandit20-do
-```
-
-Then:
+### 💻 Commands
 
 ```bash
 ./bandit20-do whoami
-```
-
-It should run as `bandit20`.
-
-Therefore:
-
-```bash
 ./bandit20-do cat /etc/bandit_pass/bandit20
 ```
 
-### 🧠 SUID
+> `./` runs a program from the current directory.
+> SUID allows the program to run with its owner's privileges.
 
-A SUID executable can run with the permissions of its owner.
-
-> ⚠️ SUID programs can become security risks when they allow unintended privileged actions.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY
@@ -1118,59 +601,37 @@ bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY
 
 ---
 
-# 🏴 Bandit Level 20 → Level 21
+# 🏴 Bandit 20 → 21
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn client/server communication using Netcat.
+Learn client/server communication.
 
-## 🧩 Problem
+### 🧩 Problem
 
-`./suconnect` connects to a port, reads the password for Bandit 20, and returns the password for Bandit 21 when the password is correct.
+`suconnect` connects to a port and checks the current password.
 
-## 💻 Commands Used
+### 💻 Commands
 
-### Terminal 1
-
-Start a listener:
+**Terminal 1:**
 
 ```bash
-nc -l -p 4444
+nc -l 4444
 ```
 
-### Terminal 2
-
-Run:
+**Terminal 2:**
 
 ```bash
 ./suconnect 4444
 ```
 
-Now return to Terminal 1 and send:
+Enter in Terminal 1:
 
 ```text
 bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY
 ```
 
-The program sends back the next password.
-
-### 🔁 Alternative
-
-On systems where supported:
-
-```bash
-echo "bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY" | nc -l 4444
-```
-
-Then in another terminal:
-
-```bash
-./suconnect 4444
-```
-
-> 🧠 The exact `nc -l` syntax can vary slightly between Netcat versions.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz
@@ -1178,47 +639,27 @@ RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz
 
 ---
 
-# 🏴 Bandit Level 21 → Level 22
+# 🏴 Bandit 21 → 22
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn how cron jobs automatically execute programs.
+Understand cron jobs.
 
-## 🧩 Problem
+### 🧩 Problem
 
-A cron job runs a script regularly. Find the script and see what it does.
+A cron job regularly runs a script that creates the password file.
 
-## 💻 Commands Used
-
-### `cat`
-
-Inspect the cron configuration:
+### 💻 Commands
 
 ```bash
 cat /etc/cron.d/cronjob_bandit22
-```
-
-Inspect the script:
-
-```bash
 cat /usr/bin/cronjob_bandit22.sh
-```
-
-The script creates a file in `/tmp`.
-
-Read that file:
-
-```bash
 cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
 ```
 
-### 🧠 Cron
+> `cron` runs commands automatically on a schedule.
 
-**cron** is a Linux service that automatically runs commands at scheduled times.
-
-`/etc/cron.d/` contains cron job configurations.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw
@@ -1226,76 +667,39 @@ gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw
 
 ---
 
-# 🏴 Bandit Level 22 → Level 23
+# 🏴 Bandit 22 → 23
 
-## 🎯 Aim
+### 🎯 Aim
 
-Learn to read and reproduce a shell script's logic.
+Understand scripts and MD5 hashing.
 
-## 🧩 Problem
+### 🧩 Problem
 
-The cron job calculates a filename using an MD5 hash, then writes the password into that file.
+The cron script creates a filename using an MD5 hash.
 
-## 💻 Commands Used
-
-Inspect the cron configuration:
+### 💻 Commands
 
 ```bash
 cat /etc/cron.d/cronjob_bandit23
-```
-
-Inspect the script:
-
-```bash
 cat /usr/bin/cronjob_bandit23.sh
 ```
 
-The important input used by the script is:
-
-```text
-I am user bandit23
-```
-
-### `md5sum`
-
-```bash
-md5sum [input]
-```
-
-> Calculates an MD5 hash.
-
-### `cut`
-
-```bash
-cut -d ' ' -f 1
-```
-
-* `-d ' '` → use a space as delimiter
-* `-f 1` → select the first field
-
-### Reproduce the filename
+Reproduce the hash:
 
 ```bash
 echo I am user bandit23 | md5sum | cut -d ' ' -f 1
 ```
 
-Result:
-
-```text
-8ca319486bfbbc3663ea0fbe81326349
-```
-
-Read the generated file:
+Then:
 
 ```bash
 cat /tmp/8ca319486bfbbc3663ea0fbe81326349
 ```
 
-### 🧠 Key idea
+> `md5sum` creates an MD5 hash.
+> `cut` extracts the needed part.
 
-Do not just run commands blindly. Read the script and reproduce its logic.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv
@@ -1303,115 +707,53 @@ hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv
 
 ---
 
-# 🏴 Bandit Level 23 → Level 24
+# 🏴 Bandit 23 → 24
 
-## 🎯 Aim
+### 🎯 Aim
 
-Write your first shell script and understand how cron can execute it with another user's privileges.
+Learn Bash scripting and cron-based privilege execution.
 
-## 🧩 Problem
+### 🧩 Problem
 
-A cron job executes scripts from a specific directory as `bandit24`.
+Cron runs files from `/var/spool/bandit24/foo/` as `bandit24`.
 
-Your job is to create a script that reads the Bandit 24 password and saves it somewhere you can read.
+### 💻 Commands
 
-## 💻 Commands Used
-
-### `mkdir`
+Create a script:
 
 ```bash
-mkdir [directory]
+nano solve.sh
 ```
 
-> Creates a directory.
-
-Create a workspace:
-
-```bash
-mkdir /tmp/bandit23
-cd /tmp/bandit23
-```
-
-### Create the script
-
-```bash
-nano exploit.sh
-```
-
-Put this inside:
+Put:
 
 ```bash
 #!/bin/bash
-
-cat /etc/bandit_pass/bandit24 > /tmp/bandit24_pass
-chmod 644 /tmp/bandit24_pass
+cat /etc/bandit_pass/bandit24 > /tmp/pass24
+chmod 644 /tmp/pass24
 ```
 
-### `chmod +x`
+Make it executable:
 
 ```bash
-chmod +x exploit.sh
+chmod +x solve.sh
 ```
 
-> Adds execute permission.
-
-### Copy the script
+Copy it:
 
 ```bash
-cp exploit.sh /var/spool/bandit24/foo/
+cp solve.sh /var/spool/bandit24/foo/
 ```
 
-> The cron job executes scripts placed in this directory.
-
-Wait for cron to execute the script, then:
+After cron runs:
 
 ```bash
-cat /tmp/bandit24_pass
+cat /tmp/pass24
 ```
 
-### Inspect the cron job
+> The script runs as `bandit24`, so it can read the Bandit 24 password.
 
-```bash
-cat /etc/cron.d/cronjob_bandit24
-```
-
-Inspect its script:
-
-```bash
-cat /usr/bin/cronjob_bandit24.sh
-```
-
-### 🧠 Important concepts
-
-#### Shebang
-
-```bash
-#!/bin/bash
-```
-
-> Tells Linux to execute the script using Bash.
-
-#### Output redirection
-
-```bash
-command > file
-```
-
-> Saves command output into a file.
-
-#### `chmod 644`
-
-```text
-6 → owner: read + write
-4 → group: read
-4 → others: read
-```
-
-This allows the `bandit23` account to read the generated password file.
-
-> ⚠️ The cron system removes submitted scripts after execution, so keep your original copy.
-
-## 🔑 Password for Next Bandit
+### 🔑 Password
 
 ```text
 hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv
