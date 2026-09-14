@@ -1,32 +1,37 @@
-🔓 Crack the Gate 1 — Writeup
-📋 What's the Challenge?
-You're given a login page. You need to get in. But instead of guessing the password, you find a secret shortcut hidden in the code. 🕵️
+# 🔓 Crack the Gate 1 — Writeup
 
-🎯 What You're Working With
-Item	Value
-📧 Email	ctf-player@picoctf.org
-🌐 Endpoint	POST /login
-🧩 Difficulty	Easy (Beginner)
+## 📋 What's the Challenge?
 
-👀 Step 1: Look at the Page Source
-Open the page in your browser → Right-click → "View Page Source"
+You're given a **login page**. You need to get in. But instead of guessing the password, you find a **secret shortcut** hidden in the code. 🕵️
+
+---
+
+## 🎯 What You're Working With
+
+| **Item** | **Value** |
+| :--- | :--- |
+| 📧 Email | `ctf-player@picoctf.org` |
+| 🌐 Endpoint | `POST /login` |
+| 🧩 Difficulty | Easy (Beginner) |
+
+---
+
+## 👀 Step 1: Look at the Page Source
+
+Open the page in your browser → **Right-click** → **View Page Source**.
 
 You'll find a hidden comment that looks like nonsense:
 
+```text
 ABGR: Wnpx - grzcbenel olcnff: hfr urnqre K-Qri-Npprff: lrf
 
 🤔 "What is this?? Random letters?"
 
 Nope! It's a code.
 
-
-web page source code example
-
-View all
 🔑 Step 2: Decode the Secret Message
-This is ROT13 — a super simple cipher. Every letter moves 13 spots forward in the alphabet.
 
-Think of it like a wheel:
+This is ROT13 — a simple substitution cipher where every letter is shifted 13 positions in the alphabet.
 
 A → N
 B → O
@@ -37,26 +42,26 @@ N → A
 O → B
 P → C
 
-So just swap each letter 13 places. That's it!
-
-Decoded message:
+So, swapping each letter by 13 positions gives:
 
 📝 NOTE: Jack — temporary bypass: use header X-Dev-Access: yes
 
 🚪 Step 3: What Does This Mean?
+
 Imagine a building with:
 
 🚪 Front door → needs a key (password)
 🚪 Back door → open to anyone who says the magic word
-Jack (the developer) accidentally left the back door open in the code. The magic word is a special header:
+
+Jack, the developer, accidentally left the back door open in the code.
+
+The magic word is this HTTP header:
 
 X-Dev-Access: yes
 
-If you include this header in your request, the server says:
+If you include this header in your request, the server accepts the request without requiring the correct password.
 
-✅ "Oh, you're a dev? Right in! No password needed!"
-
-💥 Step 4: Exploit It (PowerShell)
+💥 Step 4: Exploit It with PowerShell
 $response = Invoke-WebRequest -Uri "http://amiable-citadel.picoctf.net:61372/login" `
   -Method POST `
   -Headers @{ "X-Dev-Access" = "yes" } `
@@ -65,18 +70,14 @@ $response = Invoke-WebRequest -Uri "http://amiable-citadel.picoctf.net:61372/log
 
 $response.Content
 
-🎉 Done! The flag appears in the response. You didn't even need the real password!
+🎉 The flag appears in the response. You didn't need the real password!
 
 🏆 Flag
-picoCTF{...}
-
-(Replace with your actual flag)
-
+picoCTF{brut4_f0rc4_0d39383f}
 🧠 What Did We Learn?
 ✅ Good Practice	❌ What Went Wrong
 Remove debug code before going live	Left a backdoor in production
 Never trust user-controlled headers	Trusted X-Dev-Access blindly
 Don't hide secrets in comments	Encoded a secret in plain sight
 
-💡 Real-world lesson: Even if you "hide" a secret by encoding it, anyone who can view the source can find it. Delete debug code before deploying. Always. 🚫🔑
-
+💡 Real-world lesson: Encoding a secret doesn't make it secure. Anyone who can view the source can decode it. Remove debug code and development bypasses before deploying to production. 🚫🔑
