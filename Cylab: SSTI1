@@ -21,7 +21,7 @@ This allows us to inject template expressions, execute server-side operations, r
 ## 🎯 What You're Working With
 
 | Property                | Details                       |
-| :---------------------- | :---------------------------- |
+| ----------------------- | ----------------------------- |
 | 🌐 **Application**      | Input box + `Go` button       |
 | 🧩 **Difficulty**       | Easy                          |
 | 🛠️ **Template Engine** | Jinja2                        |
@@ -37,7 +37,7 @@ This allows us to inject template expressions, execute server-side operations, r
 For example:
 
 | Normal Application               | Vulnerable Application                   |
-| :------------------------------- | :--------------------------------------- |
+| -------------------------------- | ---------------------------------------- |
 | Input: `Hello` → Output: `Hello` | Input: `{{7*7}}` → Output: `49`          |
 | User input is treated as text    | User input is evaluated as template code |
 
@@ -60,7 +60,7 @@ Click **Go**.
 ### Expected Results
 
 | Input     | Output    | Result                           |
-| :-------- | :-------- | :------------------------------- |
+| --------- | --------- | -------------------------------- |
 | `{{7*7}}` | `49`      | ✅ SSTI confirmed                 |
 | `{{7*7}}` | `{{7*7}}` | ❌ Input is being treated as text |
 
@@ -101,7 +101,7 @@ Use the following payload:
 ### Payload Breakdown
 
 | Component          | Purpose                                 |
-| :----------------- | :-------------------------------------- |
+| ------------------ | --------------------------------------- |
 | `__import__('os')` | Imports Python's `os` module            |
 | `.popen('ls')`     | Executes the `ls` command               |
 | `.read()`          | Reads the command output                |
@@ -136,7 +136,7 @@ Now we can execute `cat flag` through the same SSTI vulnerability:
 ### Payload Breakdown
 
 | Component            | Purpose                      |
-| :------------------- | :--------------------------- |
+| -------------------- | ---------------------------- |
 | `__import__('os')`   | Imports the OS module        |
 | `.popen('cat flag')` | Executes `cat flag`          |
 | `.read()`            | Retrieves the command output |
@@ -197,7 +197,7 @@ This allows an attacker to inject template expressions and, in this environment,
 ## 🛡️ Security Lessons
 
 | ✅ Secure Practice                          | ❌ What Went Wrong                                  |
-| :----------------------------------------- | :------------------------------------------------- |
+| ------------------------------------------ | -------------------------------------------------- |
 | Treat user input strictly as data          | User input was interpreted as template code        |
 | Keep user input separate from templates    | Raw input reached the template engine              |
 | Validate and constrain input               | No effective protection against template injection |
