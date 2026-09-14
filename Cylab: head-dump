@@ -1,0 +1,213 @@
+# 🧠 Head-Dump — Writeup
+
+> **Category:** Web Exploitation
+> **Difficulty:** Easy
+> **Technology:** Node.js / Swagger UI
+> **Platform:** picoCTF
+> **Vulnerability:** Exposed Heap Dump Endpoint
+
+---
+
+## 📋 What's the Challenge?
+
+You're given a **blog website**. Somewhere on it, there's a hidden endpoint that dumps the server's **entire memory** into a file.
+
+The flag is hiding inside that memory dump. 🔍
+
+The goal is to discover the endpoint, download the heap dump, and search it for the flag.
+
+---
+
+## 🎯 What You're Working With
+
+| Item               | Value                                      |
+| ------------------ | ------------------------------------------ |
+| 🌐 **Type**        | A blog website ("picoCTF News")            |
+| 🧩 **Difficulty**  | Easy (Beginner)                            |
+| 🛠️ **Technology** | Node.js + Swagger UI                       |
+| 🎯 **Objective**   | Find and extract the flag from a heap dump |
+
+---
+
+## 🤔 What's a Heap Dump? (Super Simple)
+
+Think of the server's **RAM (memory)**. At any moment, it contains lots of information used by the application.
+
+A **heap dump** is essentially a snapshot of the application's memory at a particular point in time.
+
+> 🧠 **Analogy:** Imagine a messy desk representing the server's memory. A heap dump is like taking a photograph of the entire desk. Some information is useless, but sensitive information may also be visible.
+
+### ⚠️ Why Is This Dangerous?
+
+If an attacker can download a heap dump, it may contain sensitive information such as:
+
+* 🔑 API keys
+* 🔐 Passwords
+* 🎫 Session tokens
+* 🍪 Cookies
+* 📄 Application data
+* 🚩 CTF flags
+
+---
+
+# 👀 Step 1 — Explore the Blog
+
+Open the challenge URL in your browser.
+
+You'll see a blog with several articles.
+
+Look for an article tagged:
+
+```text
+#API Documentation
+```
+
+Click it.
+
+It takes you to:
+
+```text
+/api-docs
+```
+
+This is **Swagger UI** — an interface that documents the application's available API endpoints.
+
+Think of it as a **menu of APIs** that the server exposes. 📋
+
+---
+
+# 🔑 Step 2 — Find the Suspicious Endpoint
+
+Scroll through the API documentation.
+
+You'll find a section called:
+
+```text
+Diagnosing
+```
+
+Inside it is an endpoint:
+
+```http
+GET /heapdump
+```
+
+> 🚨 **This endpoint is suspicious.**
+
+A heap-dump endpoint is generally intended for debugging or diagnostics and should not normally be exposed publicly.
+
+If accessible without authentication, it can potentially expose sensitive information stored in application memory.
+
+---
+
+# 💥 Step 3 — Download the Heap Dump
+
+You can access the endpoint directly through your browser:
+
+```text
+http://YOUR-CHALLENGE-URL:PORT/heapdump
+```
+
+The server should return a heap snapshot file similar to:
+
+```text
+heapdump-1789389564414.heapsnapshot
+```
+
+### 💻 PowerShell Method
+
+You can also download it using PowerShell:
+
+```powershell
+Invoke-WebRequest -Uri "http://YOUR-CHALLENGE-URL:PORT/heapdump" -OutFile "heapdump.heapsnapshot"
+```
+
+The file will be saved as:
+
+```text
+heapdump.heapsnapshot
+```
+
+---
+
+# 🏆 Step 4 — Find the Flag
+
+The heap dump can be several megabytes in size, so manually reading it isn't practical.
+
+Instead, search the file for the flag format.
+
+### 🔍 PowerShell
+
+```powershell
+Select-String -Path ".\heapdump.heapsnapshot" -Pattern "picoCTF\{.*?\}" -AllMatches |
+ForEach-Object { $_.Matches.Value }
+```
+
+### 🧩 Command Breakdown
+
+| Command / Option   | Meaning                                     |
+| ------------------ | ------------------------------------------- |
+| `Select-String`    | Searches for text inside files              |
+| `-Path`            | Specifies the heap dump file                |
+| `-Pattern`         | Defines the text pattern to search for      |
+| `picoCTF\{.*?\}`   | Matches text that looks like `picoCTF{...}` |
+| `-AllMatches`      | Finds all matching occurrences              |
+| `ForEach-Object`   | Processes each matching result              |
+| `$_.Matches.Value` | Prints only the matched flag                |
+
+If the flag is stored as plain text inside the heap dump, the command should reveal it.
+
+---
+
+# 🚩 Flag
+
+```text
+picoCTF{...}
+```
+
+> Replace `picoCTF{...}` with the actual flag obtained from your challenge instance.
+
+---
+
+# 🧠 What Did We Learn?
+
+| ✅ Good Practice                                          | ❌ What Went Wrong                              |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| Remove debug endpoints before production                 | `/heapdump` was publicly accessible            |
+| Protect diagnostic APIs with authentication              | Anyone could access the endpoint               |
+| Restrict debugging functionality to trusted environments | A sensitive debugging feature was exposed      |
+| Minimize sensitive data stored in memory                 | Sensitive information could appear in the dump |
+
+---
+
+# 📌 Attack Chain
+
+```text
+Blog Website
+     ↓
+Find API Documentation
+     ↓
+/api-docs
+     ↓
+Discover GET /heapdump
+     ↓
+Download Heap Snapshot
+     ↓
+Search Heap Dump
+     ↓
+Find picoCTF{...}
+     ↓
+🏆 Flag Retrieved
+```
+
+---
+
+## 🔐 Key Takeaway
+
+> **Debugging and diagnostic endpoints should never be exposed publicly without appropriate access controls.**
+
+A heap dump can contain sensitive application data that was present in memory at the time of capture.
+
+In a real-world application, exposing such an endpoint could lead to the disclosure of **API keys, credentials, session tokens, personal data, and other secrets**.
+
+**Debug endpoints are valuable to developers — and potentially valuable to attackers.** 🚫🔓
