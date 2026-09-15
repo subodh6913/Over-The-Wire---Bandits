@@ -1,0 +1,195 @@
+# 🔍 Inspect HTML — Writeup
+
+> **Category:** Web Exploitation
+> **Difficulty:** Easy (Beginner)
+> **Key Concept:** Viewing Page Source / Inspect Element
+> **Platform:** picoCTF
+
+---
+
+## 📋 What's the Challenge?
+
+You're given a **webpage** that looks completely normal.
+
+But the flag is hiding in plain sight — inside the **HTML code** of the page.
+
+All you need to do is look behind the scenes! 👀
+
+---
+
+## 🎯 What You're Working With
+
+| Item                | Value                                 |
+| ------------------- | ------------------------------------- |
+| 🌐 **Type**         | Simple webpage                        |
+| 🧩 **Difficulty**   | Easy (Beginner)                       |
+| 🛠️ **Key Concept** | Viewing Page Source / Inspect Element |
+| 🎯 **Objective**    | Find the flag hidden inside the HTML  |
+
+---
+
+## 🤔 What Does "Inspect HTML" Mean?
+
+Every webpage you see in your browser is built using **HTML**.
+
+Your browser renders the HTML into the webpage you see, but you can also view the underlying source code.
+
+> 🧠 **Analogy:** Think of a webpage like a cooked dish 🍕. You see the pizza, but the **recipe** is hidden in the kitchen. Inspecting HTML is like going into the kitchen to read the recipe.
+
+### Two Ways to View HTML
+
+| Method                  | How                                                           |
+| ----------------------- | ------------------------------------------------------------- |
+| 📄 **View Page Source** | Right-click → **View Page Source** or press `Ctrl + U`        |
+| 🛠️ **Inspect Element** | Right-click → **Inspect** or press `F12` / `Ctrl + Shift + I` |
+
+> 💡 **Difference:** "View Source" shows the raw HTML sent by the server, while "Inspect Element" shows the current DOM, which may have been modified by JavaScript.
+
+For this challenge, **View Page Source** is the simplest approach.
+
+---
+
+# 👀 Step 1 — Open the Page
+
+Open the challenge URL in your browser.
+
+You'll see a simple webpage with some text.
+
+Nothing appears suspicious.
+
+---
+
+# 🔑 Step 2 — View the Source
+
+Right-click anywhere on the page and select:
+
+```text
+View Page Source
+```
+
+Or press:
+
+```text
+Ctrl + U
+```
+
+A new tab will open containing the **raw HTML source code**.
+
+It may look something like:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>...</title>
+  </head>
+
+  <body>
+    <h1>Welcome!</h1>
+    <p>Some text here...</p>
+
+    <!-- picoCTF{1n5p3t0r_0f_h7ml_XXXXXXXX} -->
+
+    <p>More text...</p>
+  </body>
+</html>
+```
+
+🎉 The flag is hidden inside an **HTML comment**.
+
+---
+
+# 🤔 What's an HTML Comment?
+
+An HTML comment looks like this:
+
+```html
+<!-- This is a comment. Browsers don't display it. -->
+```
+
+### Important Points
+
+* `<!--` starts the comment.
+* `-->` ends the comment.
+* Browsers don't display the comment on the webpage.
+* The comment is still included in the HTML source.
+* Anyone who can view the source can read it.
+
+> 🧠 **Analogy:** It's like a sticky note 📝 attached to the back of a poster. Visitors see the poster, but if they flip it around, they can read the note.
+
+---
+
+# 💡 Step 3 — Search for the Flag
+
+If the HTML source is large, you don't need to manually inspect everything.
+
+Press:
+
+```text
+Ctrl + F
+```
+
+Then search for:
+
+```text
+picoCTF
+```
+
+The browser should immediately highlight the flag. ⚡
+
+---
+
+# 🏆 Flag
+
+picoCTF{1n5p3t0r_0f_h7ml_1fd8425b}
+
+# 🧠 What Did We Learn?
+
+| ✅ Good Practice                             | ❌ What Went Wrong                  |
+| ------------------------------------------- | ---------------------------------- |
+| Never put secrets in HTML comments          | The flag was left inside a comment |
+| Remove sensitive comments before deployment | Comments are visible in the source |
+| Keep sensitive data server-side             | The secret was sent to the client  |
+| Treat all client-side code as public        | Anyone could inspect the HTML      |
+
+---
+
+# 📌 Attack Chain
+
+```text
+Open Challenge
+      ↓
+View Page Source
+      ↓
+Inspect HTML
+      ↓
+Search for `picoCTF`
+      ↓
+Find HTML Comment
+      ↓
+🏆 Retrieve Flag
+```
+
+---
+
+## 🔐 Key Takeaway
+
+> **Everything sent to your browser should be considered readable by the user.**
+
+HTML, CSS, and JavaScript are **client-side resources**. They should never contain sensitive information such as:
+
+* 🔑 Passwords
+* 🪪 API keys
+* 🎫 Authentication secrets
+* 🚩 CTF flags
+* 🔐 Private credentials
+
+### 🎓 Remember
+
+* `Ctrl + U` → View page source
+* `F12` → Open Developer Tools
+* `Ctrl + Shift + I` → Open Developer Tools
+* `Ctrl + F` → Search the source
+* `<!-- ... -->` → HTML comment
+
+**In web CTFs, always inspect what the server sends to your browser.** 🛠️🔍
