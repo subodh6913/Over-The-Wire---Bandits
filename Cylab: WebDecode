@@ -1,0 +1,246 @@
+# 🌐 WebDecode — Writeup
+
+> **Category:** Web Exploitation
+> **Difficulty:** Easy (Beginner)
+> **Key Concepts:** View Source / Web Inspector / Base64 Decoding
+> **Platform:** picoCTF
+
+---
+
+## 📋 What's the Challenge?
+
+You're given a **small website** with a few pages.
+
+The flag is **hidden inside the code** of one of the pages and is **Base64 encoded**.
+
+The goal is to find the encoded flag and decode it. 🔍
+
+> 💡 **Challenge hint:** *"Do you know how to use the web inspector?"*
+
+---
+
+## 🎯 What You're Working With
+
+| Item                 | Value                           |
+| -------------------- | ------------------------------- |
+| 🌐 **Type**          | Simple website with 3 pages     |
+| 🧩 **Difficulty**    | Easy (Beginner)                 |
+| 🛠️ **Key Concepts** | View Source + Base64 Decoding   |
+| 🎯 **Objective**     | Find and decode the hidden flag |
+
+---
+
+## 🤔 What's Base64?
+
+**Base64** is an encoding method that represents data using letters, numbers, and a few symbols such as `+`, `/`, and `=`.
+
+For example:
+
+| Normal Text     | Base64                 |
+| --------------- | ---------------------- |
+| `Hello`         | `SGVsbG8=`             |
+| `picoCTF{flag}` | `cGljb0NURntmbGFnfQ==` |
+
+> 🧠 **Analogy:** Base64 is like putting a message inside an envelope 📩. The message hasn't been secured — it has simply been converted into another format.
+
+### 🔎 How to Recognize Base64
+
+A Base64 string commonly:
+
+* ✅ Contains `A-Z`, `a-z`, `0-9`, `+`, `/`
+* ✅ May end with `=` or `==`
+* ✅ Usually has a length that is a multiple of 4
+* ❌ Usually doesn't contain spaces
+
+> ⚠️ **Important:** Base64 is **encoding, not encryption**.
+
+---
+
+# 👀 Step 1 — Explore the Website
+
+Open the challenge URL.
+
+You'll see a simple website with a navigation bar containing three pages.
+
+| Page           | What's There                |
+| -------------- | --------------------------- |
+| 🏠 **Home**    | Basic greeting              |
+| 📄 **About**   | ⚠️ Contains the hidden flag |
+| 📞 **Contact** | Nothing useful              |
+
+The flag isn't displayed directly on the page.
+
+That's because it is hidden inside the **HTML source code**.
+
+---
+
+# 🔑 Step 2 — View the Source of the About Page
+
+Navigate to the **About** page.
+
+Right-click and select:
+
+```text id="0ubq74"
+View Page Source
+```
+
+Or press:
+
+```text id="6a6b1g"
+Ctrl + U
+```
+
+Search through the HTML source.
+
+You should find something similar to:
+
+```html id="rj2o3v"
+<div notify_true="cGljb0NURnt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfMDJjZGNiNTl9">
+    ...
+</div>
+```
+
+The suspicious part is:
+
+```text id="g6d9x1"
+notify_true="cGljb0NURnt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfMDJjZGNiNTl9"
+```
+
+The `notify_true` attribute is a custom HTML attribute containing a Base64-encoded string.
+
+> 🚨 **Key observation:** When doing web CTFs, unusual HTML attributes and long encoded strings are worth investigating.
+
+---
+
+# 🔓 Step 3 — Decode the Base64 String
+
+Copy the encoded value:
+
+```text id="2txc5w"
+cGljb0NURnt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfMDJjZGNiNTl9
+```
+
+There are several ways to decode it.
+
+---
+
+## 🍳 Option A — CyberChef
+
+1. Open CyberChef.
+2. Paste the Base64 string into **Input**.
+3. Add the operation:
+
+   * `From Base64`
+4. Read the decoded result from **Output**. 🎉
+
+You can also try CyberChef's **Magic** operation to automatically identify common encodings.
+
+---
+
+## ⚡ Option B — PowerShell
+
+```powershell id="sq9m7k"
+[Text.Encoding]::UTF8.GetString(
+    [Convert]::FromBase64String(
+        "cGljb0NURnt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfMDJjZGNiNTl9"
+    )
+)
+```
+
+The decoded flag will be printed in the terminal.
+
+---
+
+## 🐧 Option C — Linux / WSL / Git Bash
+
+```bash id="c3b0p8"
+echo "cGljb0NURnt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfMDJjZGNiNTl9" | base64 -d
+```
+
+---
+
+# 🏆 Flag
+
+```text id="m7u3xs"
+picoCTF{web_succ3ssfully_d3c0ded_02cdcb59}
+```
+
+---
+
+# 🧠 What Did We Learn?
+
+| ✅ Good Practice                         | ❌ What Went Wrong                            |
+| --------------------------------------- | -------------------------------------------- |
+| Don't put secrets in HTML attributes    | The flag was hidden in `notify_true`         |
+| Don't rely on encoding for security     | Base64 can be easily decoded                 |
+| Remove sensitive data before deployment | The encoded flag remained in the HTML        |
+| Keep secrets server-side                | Sensitive information was sent to the client |
+
+---
+
+# 📌 Attack Chain
+
+```text id="5h8j3q"
+Open Website
+     ↓
+Explore Pages
+     ↓
+Open About Page
+     ↓
+View Page Source
+     ↓
+Find `notify_true`
+     ↓
+Extract Base64 String
+     ↓
+Decode Base64
+     ↓
+🏆 Retrieve Flag
+```
+picoCTF{web_succ3ssfully_d3c0ded_f6f6b78a}
+---
+
+## 🔐 Encoding vs Encryption
+
+This is an important concept in web security.
+
+### 📄 Encoding
+
+```text
+Plaintext
+    ↓
+Base64 Encode
+    ↓
+Encoded Data
+```
+
+Anyone can decode it.
+
+### 🔒 Encryption
+
+```text
+Plaintext
+    ↓
+Encryption + Key
+    ↓
+Ciphertext
+```
+
+A proper encryption scheme requires the appropriate key to decrypt the data.
+
+> **Base64 ≠ Encryption**
+
+Base64 is simply a different representation of data.
+
+---
+
+## 🎓 Quick Summary
+
+1. 🔍 Explore the website.
+2. 📄 View the source of each page.
+3. 👀 Look for suspicious attributes and encoded strings.
+4. 🔓 Recognize the Base64 encoding.
+5. 🛠️ Decode it using CyberChef, PowerShell, or WSL.
+6. 🏆 Retrieve the flag.
+
+**Key lesson:** Anything sent to the browser can be inspected by the user. Never treat Base64 or other client-side obfuscation as a security mechanism.
