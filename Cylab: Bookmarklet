@@ -1,0 +1,256 @@
+# 🔖 Bookmarklet — Writeup
+
+> **Category:** Web Exploitation
+> **Difficulty:** Easy (Beginner)
+> **Key Concepts:** Bookmarklets / JavaScript / Browser Console
+> **Platform:** picoCTF
+
+---
+
+## 📋 What's the Challenge?
+
+You're given a webpage that displays a block of **JavaScript code**.
+
+The challenge basically says:
+
+> *"Why search for the flag when I can make a bookmarklet to print it for me?"*
+
+The goal is to understand the JavaScript code and **execute it in your browser** to reveal the flag. 🤓
+
+---
+
+## 🎯 What You're Working With
+
+| Item                 | Value                                        |
+| -------------------- | -------------------------------------------- |
+| 🌐 **Type**          | Webpage displaying JavaScript code           |
+| 🧩 **Difficulty**    | Easy (Beginner)                              |
+| 🛠️ **Key Concepts** | Bookmarklets + JavaScript                    |
+| 🎯 **Objective**     | Execute the JavaScript and retrieve the flag |
+
+---
+
+## 🤔 What's a Bookmarklet?
+
+Normally, a **bookmark** stores a URL. Clicking it opens that webpage.
+
+A **bookmarklet** is different.
+
+Instead of storing a normal URL such as:
+
+```text
+https://example.com
+```
+
+it stores JavaScript beginning with:
+
+```text
+javascript:
+```
+
+When clicked, the browser **executes the JavaScript** instead of simply opening a webpage.
+
+> 🧠 **Analogy:** A normal bookmark is like a shortcut to a room 🚪. A bookmarklet is like a shortcut that tells the browser to perform an action.
+
+---
+
+# 👀 Step 1 — Open the Challenge Page
+
+Open the challenge URL.
+
+You'll see a textbox containing JavaScript code similar to:
+
+```javascript
+javascript:(function() {
+    var encryptedFlag = "àÒÆÞ¦È¬ëÙ£Ö...";
+    var key = "picoctf";
+    var decryptedFlag = "";
+
+    for (var i = 0; i < encryptedFlag.length; i++) {
+        decryptedFlag += String.fromCharCode(
+            (encryptedFlag.charCodeAt(i) -
+             key.charCodeAt(i % key.length) + 256) % 256
+        );
+    }
+
+    alert(decryptedFlag);
+})();
+```
+
+The exact encrypted string may differ depending on the challenge instance.
+
+---
+
+## 🔍 Understanding the Code
+
+| Code                    | Purpose                                          |
+| ----------------------- | ------------------------------------------------ |
+| `encryptedFlag`         | Contains the scrambled flag 🔒                   |
+| `key`                   | Key used to decrypt the flag 🔑                  |
+| `for` loop              | Processes every character                        |
+| `charCodeAt()`          | Converts characters into numeric character codes |
+| `String.fromCharCode()` | Converts numbers back into characters            |
+| `alert()`               | Displays the decrypted flag 🎉                   |
+
+### 🧠 In Simple Terms
+
+The code performs:
+
+```text
+Encrypted Flag
+      ↓
+Character-by-character calculation
+      ↓
+Decryption
+      ↓
+Decrypted Flag
+      ↓
+alert()
+      ↓
+🏆 Flag
+```
+
+The important point is that **both the encrypted data and the decryption logic are already available to us**.
+
+---
+
+# 💥 Step 2 — Run the JavaScript
+
+You don't actually need to create a bookmarklet.
+
+The easiest method is to execute the JavaScript using the browser's Developer Console.
+
+### 1️⃣ Open DevTools
+
+Press:
+
+```text
+F12
+```
+
+or:
+
+```text
+Ctrl + Shift + I
+```
+
+### 2️⃣ Open the Console
+
+Select:
+
+```text
+Console
+```
+
+### 3️⃣ Allow Pasting
+
+Modern browsers may display a self-XSS warning when pasting code into the console.
+
+If prompted, **type manually**:
+
+```text
+allow pasting
+```
+
+and press **Enter**.
+
+> ⚠️ Only do this when you understand and trust the code you're about to execute. Never paste unknown commands into a browser console.
+
+### 4️⃣ Execute the Challenge Code
+
+Copy the JavaScript from the challenge page and paste it into the console.
+
+Press:
+
+```text
+Enter
+```
+
+The JavaScript executes and should display the decrypted flag in an alert popup. 🎉
+
+---
+
+# 🔄 Alternative — Create an Actual Bookmarklet
+
+You can also execute the code as a real bookmarklet.
+
+### Steps
+
+1. Right-click the **Bookmarks Bar**.
+2. Select **Add Page** / **Add bookmark**.
+3. Set the name to:
+
+```text
+flag
+```
+
+4. In the URL field, paste the **entire JavaScript code**, including:
+
+```text
+javascript:
+```
+
+5. Save the bookmark.
+6. Return to the challenge page.
+7. Click the bookmarklet.
+
+The JavaScript will execute and display the flag.
+
+---
+
+# 🏆 Flag
+
+```text
+picoCTF{...}
+```
+
+> Replace `picoCTF{...}` with the actual flag from your challenge instance.
+
+---
+
+# 🧠 What Did We Learn?
+
+| ✅ Good Practice                             | ❌ What Went Wrong                                |
+| ------------------------------------------- | ------------------------------------------------ |
+| Keep secrets server-side                    | The flag was sent to the client                  |
+| Don't expose decryption keys                | The decryption key was visible                   |
+| Don't expose sensitive logic                | The complete decryption algorithm was available  |
+| Use proper authentication and authorization | Anyone accessing the page could execute the code |
+
+---
+
+# 📌 Attack Chain
+
+```text
+Challenge Page
+      ↓
+JavaScript Code
+      ↓
+Identify Encrypted Flag
+      ↓
+Identify Decryption Key
+      ↓
+Execute JavaScript
+      ↓
+Decryption Happens
+      ↓
+alert(decryptedFlag)
+      ↓
+🏆 Retrieve Flag
+```
+
+---
+
+## 🔐 Key Takeaway
+
+> **Client-side code is visible and controllable by the user.**
+
+The challenge demonstrates why simply encrypting or obfuscating a secret on the client doesn't make it secure when the **key and decryption logic are also delivered to the client**.
+
+### 🎓 Remember
+
+* 🔖 **Bookmarklet** = A bookmark that executes JavaScript.
+* 🌐 **DevTools** = Browser tools for inspecting and interacting with webpages.
+* 💻 **Console** = Allows JavaScript to be executed in the browser.
+* 🔑 **Client-side encryption** ≠ secure secret storage when the key is also exposed.
+* 🛡️ **Never send sensitive secrets to an untrusted client.**
