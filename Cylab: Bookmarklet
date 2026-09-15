@@ -200,12 +200,8 @@ The JavaScript will execute and display the flag.
 
 # 🏆 Flag
 
-```text
-picoCTF{...}
-```
-
-> Replace `picoCTF{...}` with the actual flag from your challenge instance.
-
+---
+picoCTF{p@g3_turn3r_0148cb05}
 ---
 
 # 🧠 What Did We Learn?
