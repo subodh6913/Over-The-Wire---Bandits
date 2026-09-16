@@ -1,0 +1,125 @@
+challenge
+🔐 Local Authority — Writeup
+📋 What's the Challenge?
+You're given a login page for a "secure customer portal." You need to log in as the admin.  But you don't know the username or password... or do you? 🤔
+
+💡 Hint from the challenge: "How is the password checked on this website?" 
+
+🎯 What You're Working With
+Item	Value
+🌐 Type	A login page (PHP)
+🧩 Difficulty	Easy (Beginner)
+🛠 Key Concept	Client-side code is NOT secret
+
+🤔 The Big Idea (Super Simple)
+Here's the key thing to understand:
+
+🧠 Everything sent to your browser is visible. 
+
+When a website loads, it sends you:
+
+📄 HTML (the page structure)
+🎨 CSS (the styling)
+⚡ JavaScript (the logic/code) 
+ALL of it is readable by you. The developer made a mistake here — they put the admin password in a JavaScript file that gets sent to every visitor. It's like putting your house key under the doormat and telling everyone "the key is under the doormat!" 🚪🔑
+
+👀 Step 1: Try to Log In
+Open the challenge URL. You'll see a login form.
+
+Try anything:
+
+Field	Value
+Username	admin
+Password	12345
+
+Click Login → ❌ "Log In Failed" 
+
+🤔 "How does the website check my password? On the server? Or...?" 
+
+🔑 Step 2: View the Page Source
+Right-click → "View Page Source" (or press Ctrl + U) 
+
+You'll see HTML code with a bunch of JavaScript inside. Look for a line like this:
+
+<script src="secure.js"></script>
+
+🚨 Suspicious name! A file called secure.js?  Why is a "secure" file being sent to ME?
+
+🔍 Step 3: Open the secure.js File
+You have two ways to see it:
+
+Method A: Click the link in the source
+In the page source, right-click the secure.js link → "Open link in new tab" 
+
+Method B: Use the Network tab (easier to find!)
+Press F12 → Click "Network" tab
+Go back to the login page and refresh (F5)
+In the list of files, find secure.js
+Click it → the code appears on the right! 
+You'll see something like this:
+
+function checkPassword(username, password) {
+    if (username === "admin" && password === "strongPassword098765") {
+        return true;
+    }
+    return false;
+}
+
+🎉 THERE IT IS! The admin credentials are sitting in plain text:
+
+Field	Value
+👤 Username	admin
+🔑 Password	strongPassword098765
+
+💥 Step 4: Log In!
+Go back to the login page and enter:
+
+Field	Value
+Username	admin
+Password	strongPassword098765
+
+Click Login → ✅ "Log In Successful!" 
+
+You get redirected to /admin.php and the flag is right there! 🏁 
+
+⚡ Alternative: Skip the Login Entirely (PowerShell)
+If you look closely at the JavaScript, when login succeeds it does this:
+
+document.getElementById('adminFormHash').value = "2196812e91c29df34f5e217cfd639881";
+document.getElementById('hiddenAdminForm').submit();
+
+It sends a hash to /admin.php.  You can just send that hash directly:
+
+Invoke-WebRequest -Uri "http://YOUR-CHALLENGE-URL:PORT/admin.php" `
+  -Method POST `
+  -Body "hash=2196812e91c29df34f5e217cfd639881" `
+  -ContentType "application/x-www-form-urlencoded"
+
+🎉 Flag in the response! No login needed! 
+
+🏆 Flag
+
+picoCTF{j5_15_7r4n5p4r3n7_b0c2c9cb}
+
+🧠 What Did We Learn?
+✅ Good Practice	❌ What Went Wrong
+Check passwords on the server	Checked password in client-side JavaScript
+Keep credentials secret (server-side only)	Put admin password in a .js file sent to everyone
+Don't name files "secure" if they're public	secure.js is NOT secure at all! 😂
+
+💡 The #1 rule of web security:
+
+"The client is NOT secure."
+
+Anything in HTML, CSS, or JavaScript is visible to the user.  You can hide it, obfuscate it, minify it — but a determined user will always find it.
+
+Think of it this way: 🔒
+
+Server-side = a locked safe in a bank vault ✅
+Client-side = a note stuck to your monitor that anyone walking by can read ❌
+🎓 Quick summary:
+
+View Source (Ctrl + U) or Network tab (F12)
+Find the secure.js file
+Read the plain-text credentials
+Log in → 🎉 Flag! 
