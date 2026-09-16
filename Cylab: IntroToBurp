@@ -1,0 +1,81 @@
+IntroToBurp — Writeup
+📋 What's the Challenge?
+You're given a website that asks you to register, then verify with a 2FA OTP code. The catch? You don't have the code — and you don't need it. The goal is to use Burp Suite to trick the server into thinking you're verified, so it hands you the flag.
+
+
+CTF writeup examples PicoCTF
+
+View all
+🎯 What You're Working With
+Type	Difficulty	Key Concept / Tool
+Web Exploitation	Easy	Parameter Tampering / Burp Suite
+
+🧠 The Bug (in plain English)
+Think of it like this: you walk up to a bouncer at a club and he says "Show me your ID." You hand him your ID, he checks it, and lets you in. But what if you just... don't hand him anything at all? He's so confused he just waves you through.
+
+That's exactly what's happening here. The server code says:
+
+"If the otp field exists, check it. If it's correct, give the flag."
+
+But it never says what to do if the otp field is missing. So when you remove it, the server skips the check entirely and just... lets you in. 🚪
+
+🛠️ Tools You Need
+Burp Suite Community Edition (free) — think of it as a "man-in-the-middle" that sits between your browser and the server, letting you peek at and edit every request.
+A browser with a proxy extension (FoxyProxy for Chrome/Firefox) — this tells your browser to send traffic through Burp instead of directly to the internet.
+📝 Step-by-Step Solution
+Step 1: Set Up Burp as Your Proxy 🔌
+Open Burp Suite.
+Go to Proxy → Options → confirm it's listening on 127.0.0.1:8080.
+In your browser, set the proxy to 127.0.0.1:8080 (via FoxyProxy or manual settings).
+Visit http://burp/cert in your browser → download and trust the certificate (so HTTPS sites work through Burp).
+💡 Why? Now every request your browser makes goes through Burp first, where you can inspect and modify it.
+
+Step 2: Register on the Challenge Site 📝
+Open the challenge URL: http://titan.picoctf.net:56130/
+Fill in any random values in the registration form (name, username, phone, city, password).
+Click Register.
+You'll be redirected to a 2FA / OTP page.
+Step 3: Turn ON Intercept 🕵️
+In Burp, go to Proxy → Intercept.
+Click so it says "Intercept is on".
+Now go back to the OTP page in your browser.
+Type anything in the OTP box (e.g. 1234) and hit Submit.
+Your browser freezes — that's normal! Burp is holding the request.
+Step 4: Edit the Request ✂️
+You'll see the intercepted request in Burp. At the very bottom of the body, you'll find:
+
+otp=1234
+
+Delete that entire line. The body should now be empty (or just have a newline).
+
+⚠️ Common mistake: If you can't edit in Intercept, just click Forward as-is, then go to Proxy → HTTP History, find that POST request, right-click → Send to Repeater, and edit it there. Repeater is always editable.
+
+Step 5: Forward & Get the Flag 🚩
+Click Forward (in Intercept) or Send → (in Repeater).
+Immediately turn Intercept OFF so your browser doesn't get stuck.
+Look at the response — either in Burp's response pane or on the webpage.
+You'll see something like:
+
+Welcome, B! You successfully bypassed the OTP request.
+Your flag: picoCTF{#0TP_Bypvss_SuCc3$S_c94b61ac}
+
+🧩 Why It Works (Technical Summary)
+What	Where	Why it's a bug
+otp parameter	POST body to /dashboard	Server only validates OTP if the field is present. Missing field = no check = bypass.
+
+This is called parameter tampering — you modify the request that the browser sends, in a way the developer didn't expect.
+
+⚡ Quick Cheat Sheet
+#	Action
+1	Proxy browser → Burp (127.0.0.1:8080)
+2	Register with junk data
+3	Intercept ON → submit fake OTP
+4	Delete otp=1234 from the POST body
+5	Forward → Intercept OFF
+6	Read the flag from the response
+
+🎓 What I Learned
+Burp Suite lets you intercept and modify HTTP requests.
+Parameter tampering is a real web vulnerability — always make sure your server validates that required fields are present, not just that they're correct.
+A missing field can be just as dangerous as a wrong one.
+Happy hacking! 🏁
