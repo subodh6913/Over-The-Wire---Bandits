@@ -1,0 +1,112 @@
+Researched Unminify PicoCTF challenge details
+📦 Unminify — Writeup
+📋 What's the Challenge?
+The developer "squished" their website code to make it load faster. The flag is hiding inside this squished code.  You need to un-squish it (or just search through it) to find the flag! 🔍 
+
+💡 Challenge description: "I don't like scrolling down to read the code of my website, so I've squished it. As a bonus, my pages load faster!" 
+
+
+Next Unminify challenge walkthrough
+
+View all
+🎯 What You're Working With
+Item	Value
+🌐 Type	A simple webpage
+🧩 Difficulty	Easy (Beginner)
+🛠 Key Concept	Minification + View Source
+
+🤔 What's Minification? (Super Simple)
+Normally, code looks like this (with spaces, line breaks, and nice formatting):
+
+<div class="box">
+    <p>Hello</p>
+    <p>World</p>
+</div>
+
+Minified code looks like this (all squished into one line):
+
+<div class="box"><p>Hello</p><p>World</p></div>
+
+🧠 Analogy: Think of it like packing a suitcase 🧳. You take out all the extra space (line breaks, spaces, indentation) to fit everything into a smaller space. The clothes (code) are the same — just packed tighter. 
+
+Why do developers do this?
+
+📦 Smaller file size
+⚡ Faster page loading
+🔒 Makes the code slightly harder for humans to read (but NOT for search!) 
+⚠️ Key point: Minification does NOT hide data!  Everything is still there — you just need to look harder.
+
+👀 Step 1: Open the Page
+Open the challenge URL. You'll see a simple page. Nothing suspicious on the surface. 🤷 
+
+🔑 Step 2: View the Source
+Right-click → "View Page Source" (or press Ctrl + U) 
+
+You'll see the code is all on one giant line (or a few lines).  It looks like a wall of text:
+
+<!DOCTYPE html><html><head><title>...</title><style>...</style></head><body><div class="..."><p>...</p><div class="picoCTF{pr3tty_c0d3_XXXXXXXX}">...</div>
+
+🤔 "This is a mess! How do I find the flag in all this?" 
+
+You don't need to read it all! Just search!
+
+💥 Step 3: Search for the Flag
+Press Ctrl + F (Find) and type:
+
+picoCTF
+
+🎉 The flag highlights instantly! 
+
+You'll find something like:
+
+<div class="picoCTF{pr3tty_c0d3_XXXXXXXX}">
+
+🎯 The flag is hiding inside a CSS class name!  The developer thought putting it in a class attribute would hide it. Spoiler: it doesn't. 😄
+
+🔄 Alternative: Use Inspect Element (Easier to Read!)
+Press F12 to open DevTools
+Click the "Elements" tab
+Press Ctrl + Shift + C (or the arrow icon) to enter inspect mode
+Hover over elements on the page — they'll highlight
+Or just use the "Expand All" button (the >> icon) to un-squish the code
+Then press Ctrl + F and search for picoCTF 
+💡 Tip: In Chrome's DevTools, you can also click the "Pretty Print" button (the { } icon) to auto-format the minified code into readable lines!  This makes it look like normal code again. ✨
+
+
+how to unminify code in chrome devtools
+
+View all
+⚡ Alternative: PowerShell (One-Liner!)
+If you want to grab the flag without even opening a browser:
+
+(Invoke-WebRequest -Uri "http://YOUR-CHALLENGE-URL:PORT/").Content | Select-String -Pattern "picoCTF\{.*?\}" -AllMatches | ForEach-Object { $_.Matches.Value }
+
+Part	Meaning
+Invoke-WebRequest	Download the page ⬇️
+.Content	Get the HTML text
+Select-String -Pattern "picoCTF\{.*?\}"	Find the flag pattern 🔍
+ForEach-Object { $_.Matches.Value }	Print just the flag
+
+🎉 Flag prints in your terminal! 
+
+🏆 Flag
+
+picoCTF{pr3tty_c0d3_ed938a7e} 
+
+🧠 What Did We Learn?
+✅ Good Practice	❌ What Went Wrong
+Don't put secrets in class names, comments, or any HTML	Flag was in a CSS class attribute
+Minification is for performance, not security	Thought squishing code = hiding secrets
+Keep secrets server-side only	Flag was sent to every visitor's browser
+
+💡 Key takeaway:
+
+Minification ≠ Hiding 📦🔍
+Squishing code makes it harder for humans to read, but searching (Ctrl + F) still works perfectly
+Anything sent to the browser is always accessible
+The developer thought "if I make it hard to read, no one will find the flag" — but all it takes is one Ctrl + F!  ⌨️
+🎓 Quick summary:
+
+View Source (Ctrl + U) or Inspect Element (F12)
+Search for picoCTF (Ctrl + F)
+Found it! → 🎉 Flag! 
